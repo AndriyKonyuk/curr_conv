@@ -1,0 +1,58 @@
+{% extends 'curr_conv/base.html' %}
+{% load app_filters %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="">Currency converter</h1>
+
+                <div class="col-12" id="myValue">{{ data.ticker.base }}/{{ data.ticker.target }}</div>
+                <div class="col-12">Ціна: {{ data.ticker.price }}</div>
+                <form action="/" method="GET">
+                    {% csrf_token %}
+
+                    <input id="from" type="text" name="from" placeholder="BTC" value="{{ form.from }}">
+                    <input id="to" type="text" name="to" placeholder="USD" value="{{ form.to }}">
+                    <input id="your_name" type="text" name="your_value" placeholder="How much ???"
+                           value="{{ form.your_value|safe }}">
+                    <input id="result" type="text" name="result" placeholder="You have ..."
+                           value="{{ form.your_value|mult:data.ticker.price }}">
+                    {% if not data.success %}
+                        <p class="errors">Write different currencies</p>
+                    {% endif %}
+                    <input type="submit" value="Convert">
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        setInterval(function () {
+            $.ajax({
+                url: "/", // the endpoint
+                type: "GET", // http method
+                data: {
+                    "to": $('#to').val(),
+                    "from": $('#from').val(),
+                    "your_name": $('#your_name').val(),
+                    "result": $('#result').val()
+                }, // data sent with the post request
+
+                // handle a successful response
+                success: function (json) {
+                    console.log(json); // log the returned json to the console
+                    console.log('hello world'); // log the returned json to the console
+
+                },
+
+                // handle a non-successful response
+                error: function (xhr, errmsg, err) {
+                    $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: " + errmsg +
+                        " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                }
+            });
+
+        }, 10000)
+    </script>
+
+{% endblock %}
