@@ -12,7 +12,6 @@ def add(x, y):
 def mul(x, y):
     return x * y
 
-
 @shared_task
 def xsum(numbers):
     return sum(numbers)

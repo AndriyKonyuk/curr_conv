@@ -36,13 +36,13 @@ app = Celery('tasks', backend='amqp',  broker='amqp://guest@localhost//')
 def get_api_data(request):
     s = requests.Session()
     form = request.GET
-    if 'from' in form:
-        f_f = form['from']
+    if 'form-from' in form:
+        f_f = form['form-from']
     else:
         f_f = 'BTC'
 
-    if 'to' in form:
-        f_t = form['to']
+    if 'form-to' in form:
+        f_t = form['form-to']
     else:
         f_t = 'USD'
     data = json.loads(s.get('https://api.cryptonator.com/api/ticker/%s-%s' % (f_f.lower(), f_t.lower())).text)

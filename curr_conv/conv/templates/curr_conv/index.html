@@ -6,42 +6,55 @@
             <div class="col-12">
                 <h1 class="">Currency converter</h1>
 
-                <div class="col-12" id="myValue">{{ data.ticker.base }}/{{ data.ticker.target }}</div>
-                <div class="col-12">Ціна: {{ data.ticker.price }}</div>
-                <form action="/" method="GET">
+                <div class="col-12" id="myValue">{% if resp.from %} {{ resp.from }} {% else %}
+                    {{ data.ticker.from }}{% endif %}/{% if resp.to %}{{ resp.to }}{% else %}
+                    {{ data.ticker.to }}{% endif %}</div>
+                <div class="col-12">Ціна: {{ data.ticker.from }}</div>
+                <div class="col-12">Ціна: {{ resp.price }}</div>
+                <form action="/" method="GET" id="myform">
                     {% csrf_token %}
 
-                    <input id="from" type="text" name="from" placeholder="BTC" value="{{ form.from }}">
-                    <input id="to" type="text" name="to" placeholder="USD" value="{{ form.to }}">
-                    <input id="your_name" type="text" name="your_value" placeholder="How much ???"
+                    <input id="from" type="text" name="from" placeholder="BTC" value="{{ resp.from }}">
+                    <input id="to" type="text" name="to" placeholder="USD" value="{{ resp.to }}">
+                    <input id="count" type="text" name="count" placeholder="How much ???"
                            value="{{ form.your_value|safe }}">
                     <input id="result" type="text" name="result" placeholder="You have ..."
-                           value="{{ form.your_value|mult:data.ticker.price }}">
+                           value="{{ resp.result }}">
                     {% if not data.success %}
                         <p class="errors">Write different currencies</p>
                     {% endif %}
-                    <input type="submit" value="Convert">
+                    <input id="submit" type="submit" value="Convert">
                 </form>
             </div>
         </div>
     </div>
     <script>
-        setInterval(function () {
+        $('#myform').on('submit', function (event) {
+            event.preventDefault();
+            console.log("form submitted!");  // sanity check
+            create_post();
+        });
+
+        function create_post() {
+            console.log("create post is working!"); // sanity check
             $.ajax({
-                url: "/", // the endpoint
+                url: "/test", // the endpoint
                 type: "GET", // http method
                 data: {
-                    "to": $('#to').val(),
-                    "from": $('#from').val(),
-                    "your_name": $('#your_name').val(),
-                    "result": $('#result').val()
+                    "form-to": $('#to').val(),
+                    "form-from": $('#from').val(),
+                    "form-count": $('#count').val(),
+                    "form-result": $('#result').val()
                 }, // data sent with the post request
 
                 // handle a successful response
-                success: function (json) {
-                    console.log(json); // log the returned json to the console
-                    console.log('hello world'); // log the returned json to the console
-
+                success: function (data) {
+                    if (data.is_taken) {
+                        $('#to').val(data.to);
+                        $('#from').val(data.from);
+                        $('#count').val(data.count);
+                        $('#result').val(data.result);
+                    }
                 },
 
                 // handle a non-successful response
@@ -51,8 +64,38 @@
                     console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
                 }
             });
+        };
 
-        }, 10000)
+
     </script>
+
+    {#    <script>#}
+    {#        setInterval(function () {#}
+    {#            $.ajax({#}
+    {#                url: "/", // the endpoint#}
+    {#                type: "GET", // http method#}
+    {#                data: {#}
+    {#                    "to": $('#to').val(),#}
+    {#                    "from": $('#from').val(),#}
+    {#                    "your_name": $('#your_name').val(),#}
+    {#                    "result": $('#result').val()#}
+    {#                }, // data sent with the post request#}
+    {##}
+    {#                // handle a successful response#}
+    {#                success: function (json) {#}
+    {#                    console.log(json); // log the returned json to the console#}
+    {##}
+    {#                },#}
+    {##}
+    {#                // handle a non-successful response#}
+    {#                error: function (xhr, errmsg, err) {#}
+    {#                    $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: " + errmsg +#}
+    {#                        " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom#}
+    {#                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console#}
+    {#                }#}
+    {#            });#}
+    {##}
+    {#        }, 10000)#}
+    {#    </script>#}
 
 {% endblock %}

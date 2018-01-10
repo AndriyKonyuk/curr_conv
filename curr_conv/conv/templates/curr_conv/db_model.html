@@ -1,0 +1,77 @@
+{% extends 'curr_conv/base.html' %}
+{% load app_filters %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <form action="" method="post" class="col-12">
+                    <div class="field">
+                        {{ AddAuthor.first_name.errors }}
+                        <label for="id_subject">First name:</label>
+                        {{ AddAuthor.first_name }}
+                    </div>
+                    <div class="field">
+                        {{ AddAuthor.last_name.errors }}
+                        <label for="id_email">Last name:</label>
+                        {{ AddAuthor.last_name }}
+                    </div>
+                    <div class="field">
+                        {{ AddAuthor.email.errors }}
+                        <label for="id_message">Email:</label>
+                        {{ AddAuthor.email }}
+                    </div>
+                    <div class="field">
+                        {% for choice in AddAuthor.doing.field.choices %}
+                            <div class="col-4">
+                                <input id="id_doing_{{ choice.0 }}" type="radio" name="doing" value="{{ choice.0 }}"
+                                        {% ifequal AddAuthor.data.doing choice.0 %} checked {% endifequal %}/>
+                                <label for="id_doing_{{ choice.0 }}">{{ choice.1 }}</label>
+                            </div>
+                        {% endfor %}
+                        {{ AddAuthor.doing.errors }}
+                        {#                        {{ AddAuthor.doing }}#}
+                    </div>
+
+                    <div class="field">
+                        {% if mess.good %}
+                            <p class="alert alert-success">{{ mess.good }}</p>
+                        {% elif  mess.warning %}
+                            <p class="alert alert-warning">{{ mess.warning }}</p>
+                        {% endif %}
+                    </div>
+                <div class="field">
+                    <label for="">Select user id for editing data</label>
+                    {{ AddAuthor.user_id }}
+                </div>
+                    {% csrf_token %}
+                    <input type="submit" value="Add author">
+                </form>
+            </div>
+            <div class="col-6">
+                <table class="table table-inverse">
+                    <thead class="thead-inverse">
+                    <tr>
+                        <th>ID</th>
+                        <th>First name</th>
+                        <th>Last name</th>
+                        <th>Email</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in  DB %}
+                        <tr>
+                            <th scope="row">{{ row.id }}</th>
+                            <td>{{ row.first_name }}</td>
+                            <td>{{ row.last_name }}</td>
+                            <td>{{ row.email }}</td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
